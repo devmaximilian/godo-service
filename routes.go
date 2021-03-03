@@ -46,8 +46,19 @@ func readTodo(w http.ResponseWriter, r *http.Request) {
 
 // Update an existing todo
 func updateTodo(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	vars := mux.Vars(r)
+	todo := Todos().Get(vars["id"])
+
+	var updatedTodo Todo
+	err := json.NewDecoder(r.Body).Decode(&updatedTodo)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	Todos().Update(todo, &updatedTodo)
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(todo)
 }
 
 // Delete an existing todo

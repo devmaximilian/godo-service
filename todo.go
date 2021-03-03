@@ -82,3 +82,12 @@ func (t *todos) Create(todo Todo) *Todo {
 	t.nextId++
 	return &todo
 }
+
+// Update todo
+func (t *todos) Update(todo *Todo, updated *Todo) *Todo {
+	todo.Title = updated.Title
+	todo.Order = updated.Order
+	todo.Text = updated.Text
+	todo.Completed = updated.Completed
+	return todo
+}
