@@ -34,7 +34,7 @@ func Todos() *todos {
 	return t
 }
 
-// Mutators
+// – CRUD Methods
 
 // Get todo
 func (t *todos) Get(id string) *Todo {
