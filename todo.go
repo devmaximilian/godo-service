@@ -37,7 +37,7 @@ func Todos() *todos {
 // Mutators
 
 // Get todo
-func (t todos) Get(id string) *Todo {
+func (t *todos) Get(id string) *Todo {
 	for key, item := range t.items {
 		if key == item.Id {
 			return item
@@ -47,7 +47,7 @@ func (t todos) Get(id string) *Todo {
 }
 
 // Get all todos
-func (t todos) GetAll() []*Todo {
+func (t *todos) GetAll() []*Todo {
 	items := []*Todo{}
 	for _, item := range t.items {
 		items = append(items, item)
@@ -56,7 +56,7 @@ func (t todos) GetAll() []*Todo {
 }
 
 // Get todo
-func (t todos) Delete(id string) bool {
+func (t *todos) Delete(id string) bool {
 	for key, item := range t.items {
 		if key == item.Id {
 			delete(t.items, key)
@@ -67,7 +67,7 @@ func (t todos) Delete(id string) bool {
 }
 
 // Delete all todos
-func (t todos) DeleteAll() bool {
+func (t *todos) DeleteAll() bool {
 	for key := range t.items {
 		delete(t.items, key)
 	}
@@ -75,7 +75,7 @@ func (t todos) DeleteAll() bool {
 }
 
 // Create todo
-func (t todos) Create(todo Todo) *Todo {
+func (t *todos) Create(todo Todo) *Todo {
 	todo.Id = strconv.FormatUint(t.nextId, 16)
 	todo.Url = "/todos/" + todo.Id
 	t.items[todo.Id] = &todo
