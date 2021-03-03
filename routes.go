@@ -23,13 +23,13 @@ func createTodo(w http.ResponseWriter, r *http.Request) {
 	var todo Todo
 	err := json.NewDecoder(r.Body).Decode(&todo)
 
-	if err == nil {
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	Todos().Create(todo)
-	json.NewEncoder(w).Encode(todo)
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(todo)
 }
 
 // Read an existing todo
@@ -76,13 +76,13 @@ func deleteTodos(w http.ResponseWriter, r *http.Request) {
 func configureRoutes(router *mux.Router) {
 	// Preflight routes
 	router.HandleFunc("/todos", preflight).Methods(http.MethodOptions)
-	router.HandleFunc("/todos/:id", preflight).Methods(http.MethodOptions)
+	router.HandleFunc("/todos/{id}", preflight).Methods(http.MethodOptions)
 
 	// Todo routes
 	router.HandleFunc("/todos", readTodos).Methods(http.MethodGet)
 	router.HandleFunc("/todos", createTodo).Methods(http.MethodPost)
 	router.HandleFunc("/todos", deleteTodos).Methods(http.MethodDelete)
-	router.HandleFunc("/todos/:id", readTodo).Methods(http.MethodGet)
-	router.HandleFunc("/todos/:id", updateTodo).Methods(http.MethodPatch)
-	router.HandleFunc("/todos/:id", deleteTodo).Methods(http.MethodDelete)
+	router.HandleFunc("/todos/{id}", readTodo).Methods(http.MethodGet)
+	router.HandleFunc("/todos/{id}", updateTodo).Methods(http.MethodPatch)
+	router.HandleFunc("/todos/{id}", deleteTodo).Methods(http.MethodDelete)
 }
