@@ -2,7 +2,7 @@ FROM golang:alpine AS builder
 
 RUN apk update && apk add --no-cache git
 
-WORKDIR $PWD/.build/godo-service
+WORKDIR $PWD/.build/godo
 COPY . .
 
 RUN go get -d -v

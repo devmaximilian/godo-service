@@ -1,10 +1,12 @@
-package main
+package godo
 
 import (
 	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
+
+	"github.com/devmaximilian/godo-service/internal/pkg/todo"
 )
 
 // Handle preflight
@@ -14,28 +16,28 @@ func preflight(w http.ResponseWriter, r *http.Request) {
 
 // Read all existing todos
 func readTodos(w http.ResponseWriter, r *http.Request) {
-	todos := Todos().GetAll()
+	todos := todo.Todos().GetAll()
 	json.NewEncoder(w).Encode(todos)
 }
 
 // Create a new todo
 func createTodo(w http.ResponseWriter, r *http.Request) {
-	var todo Todo
-	err := json.NewDecoder(r.Body).Decode(&todo)
+	var value todo.Todo
+	err := json.NewDecoder(r.Body).Decode(&value)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	Todos().Create(todo)
+	todo.Todos().Create(value)
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(todo)
+	json.NewEncoder(w).Encode(value)
 }
 
 // Read an existing todo
 func readTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	todo := Todos().Get(vars["id"])
+	todo := todo.Todos().Get(vars["id"])
 
 	if todo != nil {
 		json.NewEncoder(w).Encode(todo)
@@ -47,24 +49,24 @@ func readTodo(w http.ResponseWriter, r *http.Request) {
 // Update an existing todo
 func updateTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	todo := Todos().Get(vars["id"])
+	value := todo.Todos().Get(vars["id"])
 
-	var updatedTodo Todo
-	err := json.NewDecoder(r.Body).Decode(&updatedTodo)
+	var newValue todo.Todo
+	err := json.NewDecoder(r.Body).Decode(&newValue)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	Todos().Update(todo, &updatedTodo)
+	todo.Todos().Update(value, &newValue)
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(todo)
+	json.NewEncoder(w).Encode(value)
 }
 
 // Delete an existing todo
 func deleteTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	success := Todos().Delete(vars["id"])
+	success := todo.Todos().Delete(vars["id"])
 
 	if success == false {
 		w.WriteHeader(http.StatusNotFound)
@@ -75,25 +77,11 @@ func deleteTodo(w http.ResponseWriter, r *http.Request) {
 
 // Delete all existing todos
 func deleteTodos(w http.ResponseWriter, r *http.Request) {
-	success := Todos().DeleteAll()
+	success := todo.Todos().DeleteAll()
 
 	if success == false {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-}
-
-func configureRoutes(router *mux.Router) {
-	// Preflight routes
-	router.HandleFunc("/todos", preflight).Methods(http.MethodOptions)
-	router.HandleFunc("/todos/{id}", preflight).Methods(http.MethodOptions)
-
-	// Todo routes
-	router.HandleFunc("/todos", readTodos).Methods(http.MethodGet)
-	router.HandleFunc("/todos", createTodo).Methods(http.MethodPost)
-	router.HandleFunc("/todos", deleteTodos).Methods(http.MethodDelete)
-	router.HandleFunc("/todos/{id}", readTodo).Methods(http.MethodGet)
-	router.HandleFunc("/todos/{id}", updateTodo).Methods(http.MethodPatch)
-	router.HandleFunc("/todos/{id}", deleteTodo).Methods(http.MethodDelete)
 }
